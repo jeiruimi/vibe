@@ -1,3 +1,3 @@
 # vibe
 
-在线访问：[GitHub Pages](https://jeiruimi.github.io/vibe/)
+GitHub Pages 首页：[index.html](https://jeiruimi.github.io/vibe/)
