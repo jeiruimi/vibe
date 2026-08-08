@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海南茶叶 - 茶叶点餐</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 30px 18px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 244, 196, 0.42), transparent 34%),
+        linear-gradient(135deg, rgba(237, 247, 229, 0.95), rgba(214, 235, 203, 0.95)),
+        repeating-linear-gradient(45deg, rgba(58, 111, 60, 0.06) 0 1px, transparent 1px 18px);
+      color: #183d28;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+    }
+
+    .page {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.25fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .profile,
+    .shop,
+    .order-bar {
+      border: 1px solid rgba(48, 108, 59, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 250, 0.9);
+      box-shadow: 0 24px 60px rgba(30, 73, 43, 0.14);
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+      padding: 42px 36px;
+      text-align: center;
+    }
+
+    .tea-mark {
+      position: relative;
+      width: 92px;
+      height: 74px;
+      margin: 0 auto 24px;
+    }
+
+    .tea-mark::before,
+    .tea-mark::after {
+      position: absolute;
+      top: 10px;
+      width: 44px;
+      height: 60px;
+      border-radius: 80% 0 80% 0;
+      background: linear-gradient(145deg, #8cc665, #2f7d45);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+      content: "";
+    }
+
+    .tea-mark::before {
+      left: 18px;
+      transform: rotate(-24deg);
+    }
+
+    .tea-mark::after {
+      right: 18px;
+      transform: rotate(114deg);
+    }
+
+    .tea-stem {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      width: 3px;
+      height: 48px;
+      border-radius: 999px;
+      background: #6b8f3e;
+      transform: translateX(-50%) rotate(9deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #5f7d33;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      color: #173f25;
+      font-size: 44px;
+      line-height: 1.14;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .role {
+      margin: 14px 0 0;
+      color: #38633d;
+      font-size: 20px;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .intro {
+      max-width: 390px;
+      margin: 22px auto 0;
+      color: #3f5946;
+      font-size: 18px;
+      line-height: 1.85;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin: 30px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tag {
+      min-height: 38px;
+      padding: 8px 16px;
+      border: 1px solid rgba(71, 132, 50, 0.22);
+      border-radius: 999px;
+      background: #e8f4dd;
+      color: #2e6238;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .shop {
+      padding: 30px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 6px;
+      color: #173f25;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      margin-bottom: 0;
+      color: #58705f;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .fresh-badge {
+      flex: 0 0 auto;
+      min-height: 34px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: #fff2bf;
+      color: #6f6025;
+      font-size: 14px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .product {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(69, 125, 63, 0.17);
+      border-radius: 8px;
+      background: #fbfff6;
+    }
+
+    .product-art {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      background: #eef7e4;
+    }
+
+    .product-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .product h3 {
+      margin: 0;
+      color: #183d28;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .product-desc {
+      flex: 1;
+      margin: 9px 0 16px;
+      color: #536b5a;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .price {
+      color: #1e6b39;
+      font-size: 22px;
+      font-weight: 850;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .price small {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .quantity {
+      display: grid;
+      grid-template-columns: 34px 44px 34px;
+      align-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(61, 113, 55, 0.22);
+      border-radius: 999px;
+      background: #ffffff;
+    }
+
+    .qty-btn {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      background: transparent;
+      color: #2e6238;
+      font-size: 21px;
+      line-height: 1;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .qty-btn:hover,
+    .qty-btn:focus-visible {
+      background: #e8f4dd;
+      color: #174222;
+      outline: none;
+    }
+
+    .qty-input {
+      width: 44px;
+      height: 34px;
+      border: 0;
+      border-inline: 1px solid rgba(61, 113, 55, 0.14);
+      color: #183d28;
+      text-align: center;
+      background: #fffefa;
+      font-weight: 750;
+      appearance: textfield;
+    }
+
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+
+    .order-bar {
+      position: sticky;
+      bottom: 16px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 22px;
+      padding: 16px 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .total-label {
+      display: block;
+      margin-bottom: 4px;
+      color: #58705f;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .total-price {
+      color: #173f25;
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .confirm-btn {
+      min-height: 46px;
+      padding: 12px 22px;
+      border: 0;
+      border-radius: 999px;
+      background: #1f6b3a;
+      color: #fffefa;
+      font-weight: 800;
+      box-shadow: 0 12px 26px rgba(31, 107, 58, 0.25);
+      transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .confirm-btn:hover,
+    .confirm-btn:focus-visible {
+      background: #18552f;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .confirm-btn:disabled {
+      opacity: 0.48;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .modal[hidden] {
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(18, 42, 28, 0.45);
+    }
+
+    .modal-panel {
+      width: min(100%, 460px);
+      max-height: min(86vh, 640px);
+      overflow: auto;
+      border: 1px solid rgba(48, 108, 59, 0.18);
+      border-radius: 8px;
+      background: #fffefa;
+      box-shadow: 0 28px 80px rgba(12, 29, 18, 0.35);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 22px 12px;
+      border-bottom: 1px solid rgba(48, 108, 59, 0.12);
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      color: #173f25;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .close-btn {
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: #e8f4dd;
+      color: #245231;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus-visible {
+      background: #d5ecc6;
+      outline: none;
+    }
+
+    .order-lines {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 18px 22px;
+      list-style: none;
+    }
+
+    .order-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(48, 108, 59, 0.1);
+      color: #314f39;
+    }
+
+    .order-line:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .line-name {
+      font-weight: 800;
+    }
+
+    .line-qty {
+      color: #60715f;
+      font-size: 14px;
+    }
+
+    .line-subtotal {
+      align-self: center;
+      color: #1e6b39;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .modal-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 22px 22px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #e8f4dd;
+      color: #183d28;
+      font-weight: 800;
+    }
+
+    .modal-total strong {
+      color: #173f25;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .profile {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 18px 12px;
+      }
+
+      .profile,
+      .shop {
+        padding: 28px 20px;
+      }
+
+      .tea-mark {
+        width: 78px;
+        height: 64px;
+        margin-bottom: 20px;
+      }
+
+      .tea-mark::before,
+      .tea-mark::after {
+        width: 38px;
+        height: 52px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      .role {
+        font-size: 18px;
+      }
+
+      .intro {
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .tag {
+        font-size: 14px;
+        white-space: normal;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .fresh-badge {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 14px;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .product-art {
+        height: 100%;
+        min-height: 162px;
+        aspect-ratio: auto;
+      }
+
+      .product-body {
+        padding: 14px;
+      }
+
+      .product h3 {
+        font-size: 16px;
+      }
+
+      .product-desc {
+        margin-bottom: 13px;
+        font-size: 13px;
+      }
+
+      .product-meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .order-bar {
+        bottom: 10px;
+        flex-wrap: wrap;
+        padding: 14px;
+      }
+
+      .confirm-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .product {
+        grid-template-columns: 1fr;
+      }
+
+      .product-art {
+        min-height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="hero">
+      <section class="profile" aria-label="海南茶叶店铺信息">
+        <div class="tea-mark" aria-hidden="true">
+          <span class="tea-stem"></span>
+        </div>
+
+        <p class="eyebrow">海垦白沙绿茶</p>
+        <h1>海南茶叶</h1>
+        <p class="role">海南茶叶店老板</p>
+        <p class="intro">卖了15年海南茶叶，正宗海垦白沙绿茶。</p>
+
+        <ul class="tags" aria-label="服务标签">
+          <li class="tag">正宗海南味</li>
+          <li class="tag">一袋也是批发价</li>
+          <li class="tag">送货上门</li>
+        </ul>
+      </section>
+
+      <section class="shop" aria-label="茶叶套餐">
+        <div class="section-head">
+          <div>
+            <h2>茶叶套餐</h2>
+            <p>从日常自饮到送礼分享，都是白沙绿茶的清爽香气。</p>
+          </div>
+          <span class="fresh-badge">今日可送</span>
+        </div>
+
+        <div class="product-grid">
+          <article class="product" data-name="白沙绿茶尝鲜装" data-price="39">
+            <svg class="product-art" viewBox="0 0 320 240" role="img" aria-label="白沙绿茶尝鲜装配图">
+              <rect width="320" height="240" fill="#eef7e4"></rect>
+              <circle cx="68" cy="58" r="42" fill="#fff4c7"></circle>
+              <path d="M0 170 C68 130 111 184 173 146 S276 125 320 152 V240 H0 Z" fill="#c9e5ad"></path>
+              <path d="M0 192 C75 160 129 205 197 172 S285 159 320 184 V240 H0 Z" fill="#7fb95f"></path>
+              <rect x="116" y="64" width="92" height="122" rx="10" fill="#fffdf4" stroke="#79a85b" stroke-width="4"></rect>
+              <rect x="130" y="84" width="64" height="46" rx="8" fill="#e0f0cc"></rect>
+              <path d="M150 114 C136 95 150 78 176 84 C178 107 168 119 150 114 Z" fill="#2f7d45"></path>
+              <path d="M162 114 C171 97 187 94 199 108 C187 125 174 128 162 114 Z" fill="#69a844"></path>
+              <path d="M128 148 H196" stroke="#7a9b58" stroke-width="7" stroke-linecap="round"></path>
+              <path d="M140 166 H184" stroke="#abc270" stroke-width="7" stroke-linecap="round"></path>
+            </svg>
+            <div class="product-body">
+              <h3>白沙绿茶尝鲜装</h3>
+              <p class="product-desc">小袋清香，适合初次品尝海南白沙绿茶。</p>
+              <div class="product-meta">
+                <div class="price"><small>¥</small>39</div>
+                <div class="quantity" aria-label="白沙绿茶尝鲜装数量">
+                  <button class="qty-btn" type="button" data-action="minus" title="减少数量" aria-label="减少白沙绿茶尝鲜装数量">−</button>
+                  <input class="qty-input" type="number" min="0" max="99" value="0" inputmode="numeric" aria-label="白沙绿茶尝鲜装购买数量">
+                  <button class="qty-btn" type="button" data-action="plus" title="增加数量" aria-label="增加白沙绿茶尝鲜装数量">+</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product" data-name="海垦白沙家庭装" data-price="88">
+            <svg class="product-art" viewBox="0 0 320 240" role="img" aria-label="海垦白沙家庭装配图">
+              <rect width="320" height="240" fill="#eef7e4"></rect>
+              <path d="M0 172 C62 124 122 178 184 140 S278 118 320 150 V240 H0 Z" fill="#d7eabd"></path>
+              <path d="M0 196 C74 158 138 204 202 168 S286 157 320 184 V240 H0 Z" fill="#6fa958"></path>
+              <ellipse cx="160" cy="166" rx="78" ry="18" fill="#527840" opacity="0.2"></ellipse>
+              <rect x="91" y="78" width="62" height="100" rx="9" fill="#fffdf4" stroke="#7da85a" stroke-width="4"></rect>
+              <rect x="167" y="62" width="62" height="116" rx="9" fill="#fffdf4" stroke="#7da85a" stroke-width="4"></rect>
+              <rect x="104" y="96" width="36" height="34" rx="8" fill="#e5f3d4"></rect>
+              <rect x="180" y="82" width="36" height="38" rx="8" fill="#e5f3d4"></rect>
+              <path d="M111 148 H137" stroke="#abc270" stroke-width="7" stroke-linecap="round"></path>
+              <path d="M187 142 H213" stroke="#abc270" stroke-width="7" stroke-linecap="round"></path>
+              <path d="M118 121 C106 103 122 90 143 96 C143 116 135 127 118 121 Z" fill="#2f7d45"></path>
+              <path d="M194 111 C183 93 199 78 220 86 C219 106 211 117 194 111 Z" fill="#2f7d45"></path>
+            </svg>
+            <div class="product-body">
+              <h3>海垦白沙家庭装</h3>
+              <p class="product-desc">日常泡饮更划算，办公室和家里都合适。</p>
+              <div class="product-meta">
+                <div class="price"><small>¥</small>88</div>
+                <div class="quantity" aria-label="海垦白沙家庭装数量">
+                  <button class="qty-btn" type="button" data-action="minus" title="减少数量" aria-label="减少海垦白沙家庭装数量">−</button>
+                  <input class="qty-input" type="number" min="0" max="99" value="0" inputmode="numeric" aria-label="海垦白沙家庭装购买数量">
+                  <button class="qty-btn" type="button" data-action="plus" title="增加数量" aria-label="增加海垦白沙家庭装数量">+</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="product" data-name="海南绿茶礼盒装" data-price="168">
+            <svg class="product-art" viewBox="0 0 320 240" role="img" aria-label="海南绿茶礼盒装配图">
+              <rect width="320" height="240" fill="#eef7e4"></rect>
+              <circle cx="249" cy="54" r="34" fill="#fff2bf"></circle>
+              <path d="M0 176 C70 130 126 178 192 142 S282 127 320 158 V240 H0 Z" fill="#cfe6b2"></path>
+              <path d="M0 200 C79 160 136 204 202 169 S286 158 320 186 V240 H0 Z" fill="#78b55b"></path>
+              <rect x="76" y="76" width="168" height="106" rx="12" fill="#fffdf4" stroke="#7da85a" stroke-width="4"></rect>
+              <path d="M76 112 H244" stroke="#d5b95f" stroke-width="14"></path>
+              <path d="M157 76 V182" stroke="#d5b95f" stroke-width="14"></path>
+              <path d="M159 80 C134 52 107 60 111 86 C130 96 146 95 159 80 Z" fill="#2f7d45"></path>
+              <path d="M161 80 C183 50 214 59 210 87 C190 98 174 95 161 80 Z" fill="#69a844"></path>
+              <path d="M105 154 H215" stroke="#89a95c" stroke-width="7" stroke-linecap="round"></path>
+            </svg>
+            <div class="product-body">
+              <h3>海南绿茶礼盒装</h3>
+              <p class="product-desc">清新体面，适合节日送礼和客户伴手礼。</p>
+              <div class="product-meta">
+                <div class="price"><small>¥</small>168</div>
+                <div class="quantity" aria-label="海南绿茶礼盒装数量">
+                  <button class="qty-btn" type="button" data-action="minus" title="减少数量" aria-label="减少海南绿茶礼盒装数量">−</button>
+                  <input class="qty-input" type="number" min="0" max="99" value="0" inputmode="numeric" aria-label="海南绿茶礼盒装购买数量">
+                  <button class="qty-btn" type="button" data-action="plus" title="增加数量" aria-label="增加海南绿茶礼盒装数量">+</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <section class="order-bar" aria-label="订单总价">
+      <div>
+        <span class="total-label">订单总价</span>
+        <strong class="total-price" id="totalPrice" aria-live="polite">¥0</strong>
+      </div>
+      <button class="confirm-btn" id="confirmOrder" type="button" disabled>确认订单</button>
+    </section>
+  </main>
+
+  <div class="modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h2 id="modalTitle">订单汇总</h2>
+        <button class="close-btn" type="button" id="closeModal" aria-label="关闭订单汇总">×</button>
+      </div>
+      <ul class="order-lines" id="orderLines"></ul>
+      <div class="modal-total">
+        <span>合计</span>
+        <strong id="modalTotal">¥0</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const currency = new Intl.NumberFormat("zh-CN", {
+      style: "currency",
+      currency: "CNY",
+      maximumFractionDigits: 0
+    });
+
+    const products = Array.from(document.querySelectorAll(".product"));
+    const totalPrice = document.querySelector("#totalPrice");
+    const confirmOrder = document.querySelector("#confirmOrder");
+    const orderModal = document.querySelector("#orderModal");
+    const closeModal = document.querySelector("#closeModal");
+    const orderLines = document.querySelector("#orderLines");
+    const modalTotal = document.querySelector("#modalTotal");
+
+    function normalizeQuantity(value) {
+      const parsed = Number.parseInt(value, 10);
+      if (Number.isNaN(parsed) || parsed < 0) {
+        return 0;
+      }
+      return Math.min(parsed, 99);
+    }
+
+    function getOrderItems() {
+      return products.map((product) => {
+        const input = product.querySelector(".qty-input");
+        const quantity = normalizeQuantity(input.value);
+        const price = Number(product.dataset.price);
+        return {
+          name: product.dataset.name,
+          price,
+          quantity,
+          subtotal: price * quantity
+        };
+      }).filter((item) => item.quantity > 0);
+    }
+
+    function updateTotal() {
+      const items = getOrderItems();
+      const total = items.reduce((sum, item) => sum + item.subtotal, 0);
+      totalPrice.textContent = currency.format(total);
+      confirmOrder.disabled = total === 0;
+      return { items, total };
+    }
+
+    function setQuantity(product, nextValue) {
+      const input = product.querySelector(".qty-input");
+      input.value = normalizeQuantity(nextValue);
+      updateTotal();
+    }
+
+    products.forEach((product) => {
+      const input = product.querySelector(".qty-input");
+      const minus = product.querySelector('[data-action="minus"]');
+      const plus = product.querySelector('[data-action="plus"]');
+
+      minus.addEventListener("click", () => {
+        setQuantity(product, normalizeQuantity(input.value) - 1);
+      });
+
+      plus.addEventListener("click", () => {
+        setQuantity(product, normalizeQuantity(input.value) + 1);
+      });
+
+      input.addEventListener("input", updateTotal);
+      input.addEventListener("change", () => {
+        setQuantity(product, input.value);
+      });
+    });
+
+    confirmOrder.addEventListener("click", () => {
+      const { items, total } = updateTotal();
+
+      orderLines.innerHTML = items.map((item) => `
+        <li class="order-line">
+          <span class="line-name">${item.name}</span>
+          <span class="line-subtotal">${currency.format(item.subtotal)}</span>
+          <span class="line-qty">${currency.format(item.price)} × ${item.quantity}</span>
+        </li>
+      `).join("");
+
+      modalTotal.textContent = currency.format(total);
+      orderModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      closeModal.focus();
+    });
+
+    function hideModal() {
+      orderModal.hidden = true;
+      document.body.style.overflow = "";
+      confirmOrder.focus();
+    }
+
+    closeModal.addEventListener("click", hideModal);
+
+    orderModal.addEventListener("click", (event) => {
+      if (event.target === orderModal) {
+        hideModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !orderModal.hidden) {
+        hideModal();
+      }
+    });
+
+    updateTotal();
+  </script>
+</body>
+</html>
